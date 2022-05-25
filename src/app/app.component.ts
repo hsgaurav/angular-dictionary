@@ -1,7 +1,10 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatTable, MatTableDataSource} from "@angular/material/table";
 import {MatDialog} from "@angular/material/dialog";
 import {DialogBoxComponent} from "./dialog-box/dialog-box.component";
+import {WordService} from "./word.service";
+import {Observable} from "rxjs";
+import {Dictionary} from "./dictionary";
 
 interface PeriodicElement {
   position: number;
@@ -15,27 +18,34 @@ interface PeriodicElement {
   styleUrls: ['./app.component.css']
 })
 
-export class AppComponent {
+export class AppComponent implements OnInit {
+  word: Observable<PeriodicElement[]> = new Observable<PeriodicElement[]>();
   title = 'dictionary';
   dataSource = new MatTableDataSource<PeriodicElement>([]);
   displayedColumns: string[] = ['position', 'word', 'action'];
-  inputWord: string;
+  inputWord: Dictionary = new Dictionary();
   @ViewChild(MatTable, {static: true}) table: MatTable<any> | undefined;
 
-  constructor(public dialog: MatDialog) {
-    this.inputWord = "";
+  constructor(public dialog: MatDialog, private wordService: WordService) {
   }
 
-  refresh(): void {
-    this.dataSource.data = this.dataSource.data;
+  refresh() {
+    this.word = this.wordService.getDictionary();
   }
 
   ngOnInit(): void {
+    this.refresh();
   }
 
   onsave() {
+    this.wordService
+      .saveWord(this.inputWord).subscribe(data => {
+        console.log(data)
+        this.inputWord = new Dictionary();
+      },
+      error => console.log(error));
     this.dataSource.data.push({position: this.dataSource.data.length + 1, word: this.inputWord});
-    this.refresh();
+    // this.refresh();
   }
 
   openDialog({action, obj}: { action: any, obj: any }) {
@@ -65,9 +75,16 @@ export class AppComponent {
   }
 
   private deleteRowData({data}: { data: any }) {
-    this.dataSource.data = this.dataSource.data.filter((value, key) => {
-      return value.position != data.position;
-    });
+    this.wordService.deleteWord(data)
+      .subscribe(
+        data => {
+          console.log(data);
+          this.refresh();
+        },
+        error => console.log(error));
+    // this.dataSource.data = this.dataSource.data.filter((value, key) => {
+    //   return value.position != data.position;
+    // });
   }
 }
 
