@@ -19,33 +19,34 @@ interface PeriodicElement {
 })
 
 export class AppComponent implements OnInit {
-  word: Observable<PeriodicElement[]> = new Observable<PeriodicElement[]>();
+  dictWord: Observable<PeriodicElement[]> = new Observable<PeriodicElement[]>();
   title = 'dictionary';
   dataSource = new MatTableDataSource<PeriodicElement>([]);
   displayedColumns: string[] = ['position', 'word', 'action'];
-  inputWord: Dictionary = new Dictionary();
+  wordDict: Dictionary = new Dictionary();
+  inputWord: string = this.wordDict.word;
   @ViewChild(MatTable, {static: true}) table: MatTable<any> | undefined;
 
   constructor(public dialog: MatDialog, private wordService: WordService) {
   }
 
   refresh() {
-    this.word = this.wordService.getDictionary();
+    this.dictWord = this.wordService.getDictionary();
   }
 
   ngOnInit(): void {
     this.refresh();
   }
 
-  onsave() {
+  onSave() {
+    this.wordDict.word = this.inputWord;
     this.wordService
-      .saveWord(this.inputWord).subscribe(data => {
-        console.log(data)
-        this.inputWord = new Dictionary();
-      },
-      error => console.log(error));
-    this.dataSource.data.push({position: this.dataSource.data.length + 1, word: this.inputWord});
-    // this.refresh();
+      .saveWord(this.wordDict)
+      .subscribe(data => {
+          console.log(data)
+          this.refresh();
+        },
+        error => alert("Duplicate Word!"));
   }
 
   openDialog({action, obj}: { action: any, obj: any }) {
@@ -75,7 +76,8 @@ export class AppComponent implements OnInit {
   }
 
   private deleteRowData({data}: { data: any }) {
-    this.wordService.deleteWord(data)
+    this.wordDict.word = data.name;
+    this.wordService.deleteWord(this.wordDict)
       .subscribe(
         data => {
           console.log(data);
