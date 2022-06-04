@@ -21,12 +21,11 @@ export class WordService {
     return this.http.post(`${this.baseUrl}`, word);
   }
 
-  updateWord(updatedWord: string, word: any): Observable<Object> {
-    return this.http.put(`${this.baseUrl}/${updatedWord}`, word);
+  updateWord(actualWord: string, updatedWord: any): Observable<Object> {
+    return this.http.put(`${this.baseUrl}/${actualWord}`, updatedWord);
   }
 
-  deleteWord(word: Dictionary): Observable<any> {
-    return this.http.delete(`${this.baseUrl}`,
-      {body: word});
+  deleteWord(word: String): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${word}`);
   }
 }

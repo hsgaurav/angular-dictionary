@@ -21,7 +21,7 @@ interface PeriodicElement {
 export class AppComponent implements OnInit {
   dictWord: Observable<PeriodicElement[]> = new Observable<PeriodicElement[]>();
   title = 'dictionary';
-  dataSource = new MatTableDataSource<PeriodicElement>([]);
+  // dataSource = new MatTableDataSource<PeriodicElement>([]);
   displayedColumns: string[] = ['position', 'word', 'action'];
   wordDict: Dictionary = new Dictionary();
   inputWord: string = this.wordDict.word;
@@ -38,12 +38,18 @@ export class AppComponent implements OnInit {
     this.refresh();
   }
 
+  validateWord(word: string) {
+    if (!(word && word.trim())) {
+      alert("Empty Word!");
+    }
+  }
+
   onSave() {
+    this.validateWord(this.inputWord);
     this.wordDict.word = this.inputWord;
     this.wordService
       .saveWord(this.wordDict)
       .subscribe(data => {
-          console.log(data)
           this.refresh();
         },
         error => alert("Duplicate Word!"));
@@ -66,27 +72,23 @@ export class AppComponent implements OnInit {
   }
 
   private updateRowData({data}: { data: any }) {
-    console.log(data);
-    this.dataSource.data = this.dataSource.data.filter((value, key) => {
-      if (value.position == data.position) {
-        value.word = data.name;
-      }
-      return true;
-    });
-  }
-
-  private deleteRowData({data}: { data: any }) {
-    this.wordDict.word = data.name;
-    this.wordService.deleteWord(this.wordDict)
+    this.validateWord(data.name);
+    this.wordDict.word = data.name
+    this.wordService.updateWord(data.word, this.wordDict)
       .subscribe(
         data => {
-          console.log(data);
           this.refresh();
         },
         error => console.log(error));
-    // this.dataSource.data = this.dataSource.data.filter((value, key) => {
-    //   return value.position != data.position;
-    // });
+  }
+
+  private deleteRowData({data}: { data: any }) {
+    this.wordService.deleteWord(data.word)
+      .subscribe(
+        data => {
+          this.refresh();
+        },
+        error => console.log(error));
   }
 }
 
