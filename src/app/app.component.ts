@@ -7,7 +7,6 @@ import {Observable} from "rxjs";
 import {Dictionary} from "./dictionary";
 
 interface PeriodicElement {
-  position: number;
   word: string;
   action?: any;
 }
@@ -21,8 +20,7 @@ interface PeriodicElement {
 export class AppComponent implements OnInit {
   dictWord: Observable<PeriodicElement[]> = new Observable<PeriodicElement[]>();
   title = 'dictionary';
-  // dataSource = new MatTableDataSource<PeriodicElement>([]);
-  displayedColumns: string[] = ['position', 'word', 'action'];
+  displayedColumns: string[] = ['word', 'action'];
   wordDict: Dictionary = new Dictionary();
   inputWord: string = this.wordDict.word;
   @ViewChild(MatTable, {static: true}) table: MatTable<any> | undefined;
@@ -54,6 +52,7 @@ export class AppComponent implements OnInit {
           },
           error => alert("Duplicate Word!"));
     }
+    this.inputWord = "";
   }
 
   openDialog({action, obj}: { action: any, obj: any }) {
