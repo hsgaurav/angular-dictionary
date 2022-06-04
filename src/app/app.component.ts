@@ -38,21 +38,22 @@ export class AppComponent implements OnInit {
     this.refresh();
   }
 
-  validateWord(word: string) {
-    if (!(word && word.trim())) {
-      alert("Empty Word!");
-    }
+  private validateWord(word: string) {
+    return !(word && word.trim())
   }
 
   onSave() {
-    this.validateWord(this.inputWord);
-    this.wordDict.word = this.inputWord;
-    this.wordService
-      .saveWord(this.wordDict)
-      .subscribe(data => {
-          this.refresh();
-        },
-        error => alert("Duplicate Word!"));
+    if (this.validateWord(this.inputWord)) {
+      alert("Empty Word!");
+    } else {
+      this.wordDict.word = this.inputWord;
+      this.wordService
+        .saveWord(this.wordDict)
+        .subscribe(data => {
+            this.refresh();
+          },
+          error => alert("Duplicate Word!"));
+    }
   }
 
   openDialog({action, obj}: { action: any, obj: any }) {
@@ -72,14 +73,17 @@ export class AppComponent implements OnInit {
   }
 
   private updateRowData({data}: { data: any }) {
-    this.validateWord(data.name);
-    this.wordDict.word = data.name
-    this.wordService.updateWord(data.word, this.wordDict)
-      .subscribe(
-        data => {
-          this.refresh();
-        },
-        error => console.log(error));
+    if (this.validateWord(data.name)) {
+      alert("Empty Word!");
+    } else {
+      this.wordDict.word = data.name
+      this.wordService.updateWord(data.word, this.wordDict)
+        .subscribe(
+          data => {
+            this.refresh();
+          },
+          error => console.log(error));
+    }
   }
 
   private deleteRowData({data}: { data: any }) {
