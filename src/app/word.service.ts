@@ -8,7 +8,7 @@ import {Dictionary} from "./dictionary";
 })
 export class WordService {
 
-  private baseUrl = 'http://localhost:8080/dictionary';
+  private baseUrl = 'https://dictionary-word-api.herokuapp.com/dictionary';
 
   constructor(private http: HttpClient) {
   }
