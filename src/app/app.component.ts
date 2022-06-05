@@ -21,7 +21,7 @@ export class AppComponent implements OnInit {
   dictWord: Observable<PeriodicElement[]> = new Observable<PeriodicElement[]>();
   title = 'dictionary';
   displayedColumns: string[] = ['word', 'action'];
-  wordDict: Dictionary = new Dictionary();
+  wordDict: Dictionary = new Dictionary("");
   inputWord: string = this.wordDict.word;
   @ViewChild(MatTable, {static: true}) table: MatTable<any> | undefined;
 
@@ -44,15 +44,19 @@ export class AppComponent implements OnInit {
     if (this.validateWord(this.inputWord)) {
       alert("Empty Word!");
     } else {
-      this.wordDict.word = this.inputWord;
-      this.wordService
-        .saveWord(this.wordDict)
-        .subscribe(data => {
-            this.refresh();
-          },
-          error => alert("Duplicate Word!"));
+      this.saveWord();
     }
     this.inputWord = "";
+  }
+
+  private saveWord() {
+    this.wordDict.word = this.inputWord;
+    this.wordService
+      .saveWord(this.wordDict)
+      .subscribe(data => {
+          this.refresh();
+        },
+        error => alert("Duplicate Word!"));
   }
 
   openDialog({action, obj}: { action: any, obj: any }) {
@@ -75,18 +79,22 @@ export class AppComponent implements OnInit {
     if (this.validateWord(data.name)) {
       alert("Empty Word!");
     } else {
-      this.wordDict.word = data.name
-      this.wordService.updateWord(data.word, this.wordDict)
-        .subscribe(
-          data => {
-            this.refresh();
-          },
-          error => console.log(error));
+      this.updateWord(data);
     }
   }
 
   private deleteRowData({data}: { data: any }) {
     this.wordService.deleteWord(data.word)
+      .subscribe(
+        data => {
+          this.refresh();
+        },
+        error => console.log(error));
+  }
+
+  private updateWord(data: any) {
+    this.wordDict.word = data.name
+    this.wordService.updateWord(data.word, this.wordDict)
       .subscribe(
         data => {
           this.refresh();

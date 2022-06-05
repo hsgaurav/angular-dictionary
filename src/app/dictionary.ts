@@ -1,3 +1,7 @@
 export class Dictionary {
-  word: string = "";
+  word: string;
+
+  constructor(word: string) {
+    this.word = word;
+  }
 }
